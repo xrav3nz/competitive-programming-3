@@ -5,8 +5,9 @@
 
 using namespace std;
 
-string in, out, seq;
-bool stop;
+string in, out, blank("");
+int in_size;
+stack<char> s;
 
 bool AreAnagram () {
     string _in = in;
@@ -16,23 +17,30 @@ bool AreAnagram () {
     return (_in == _out);
 }
 
-bool StackOp () {
-    stack<char> s;
-    int i = 0, j = 0;
-    for (auto c : seq) {
-        if (c == 'i') {
-            s.push(in[i++]);
-        } else {
-            if (s.empty()) {
-                return false;
-            } else {
-                if (out[j++] != s.top())
-                    return false;
-                s.pop();
-            }
+void Generate(int is, int os, string &seq) {
+    if (is > 0) {
+        seq.push_back('i');
+        s.push(in[in_size - is]);
+        Generate (is - 1, os, seq);
+        s.pop();
+        seq.pop_back();
+    }
+
+    if (os > 0 && os > is && s.top() == out[in_size - os]) {
+        s.pop();
+        seq.push_back('o');
+        Generate (is, os - 1, seq);
+        seq.pop_back();
+        s.push(out[in_size - os]);
+    }
+
+    if (os == 0 && is == 0) {
+        for (int i = 0; i < in_size * 2; ++i) {
+            cout << seq[i] << " \n"[i == in_size * 2 - 1];
         }
     }
-    return true;
+
+    return ;
 }
 
 int main (int argc, char const *argv[]) {
@@ -44,20 +52,14 @@ int main (int argc, char const *argv[]) {
     #endif
 
     while (cin >> in >> out) {
-        cout << '[' << endl;
         if (in.size() != out.size() || !AreAnagram()) {
-            cout << ']' << endl;
-            continue;
+            cout << "[\n]\n";
+        } else {
+            in_size = in.size();
+            cout << "[\n";
+            Generate(in_size, in_size, blank);
+            cout << "]\n";
         }
-        seq = string(in.size(), 'i') + string(in.size(), 'o');
-        do {
-            if (StackOp()) {
-                for (int i = 0; i < seq.size(); ++i) {
-                    cout << seq[i] << " \n"[i + 1 == seq.size()];
-                }
-            }
-        } while (next_permutation(seq.begin(), seq.end()) && !stop);
-        cout << ']' << endl;
     }
     
     return 0;
