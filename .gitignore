@@ -1,5 +1,4 @@
-*
-!*.cpp
-!*.java
-generator.cpp
-*_ip.cpp
+bin/
+*.in
+*.out
+gen.cpp
